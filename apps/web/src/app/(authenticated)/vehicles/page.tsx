@@ -1,8 +1,8 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Button, Table, Modal, Form, Input, Select, Typography,Space} from 'antd'
-import { PlusOutlined, CarOutlined,CalendarOutlined,IdcardOutlined,AppstoreAddOutlined } from '@ant-design/icons'
+import { Button, Table, Modal, Form, Input, Select, Typography } from 'antd'
+import { PlusOutlined } from '@ant-design/icons'
 const { Title, Text } = Typography
 const { Option } = Select
 import { useAuthentication } from '@web/modules/authentication'
@@ -118,29 +118,19 @@ export default function VehicleManagementPage() {
 
   return (
     <PageLayout layout="full-width">
-      <Title level={2}><CarOutlined style={{ marginRight: 8 }}/>Vehicle Management</Title>
+      <Title level={2}>Vehicle Management</Title>
       <Text>
         Manage and overview all vehicles within the fleet, including adding,
         editing, and viewing detailed information.
       </Text>
       <Button
-    type="primary"
-    icon={<PlusOutlined />}
-     onClick={() => setIsModalVisible(true)}
-  style={{
-    marginBottom: 16,
-    backgroundColor: '#3f8600', // Default green color
-    borderColor: '#3f8600',
-    transition: 'background-color 0.3s, border-color 0.3s',
-    ':hover': {
-      backgroundColor: '#52c41a', // Lighter green on hover
-      borderColor: '#52c41a'
-    }
-  }}
->
-  Add Vehicle
-</Button>
-
+        type="primary"
+        icon={<PlusOutlined />}
+        onClick={() => setIsModalVisible(true)}
+        style={{ marginBottom: 16 }}
+      >
+        Add Vehicle
+      </Button>
       <Table dataSource={vehicles} columns={columns} rowKey="id" />
       <Modal
         title="Add New Vehicle"
@@ -151,14 +141,14 @@ export default function VehicleManagementPage() {
         <Form form={form} onFinish={handleAddVehicle} layout="vertical">
           <Form.Item
             name="licensePlate"
-            label={<Space><IdcardOutlined />License Plate</Space>}
+            label="License Plate"
             rules={[{ required: true }]}
           >
             <Input />
           </Form.Item>
           <Form.Item
             name="vehicleTypeId"
-            label={<Space><CarOutlined />Vehicle Type</Space>}
+            label="Vehicule Type"
             rules={[{ required: true }]}
           >
             <Select placeholder="Select a type">
@@ -170,15 +160,15 @@ export default function VehicleManagementPage() {
 
             </Select>
           </Form.Item>
-          <Form.Item name="model" label={<Space><AppstoreAddOutlined />Model</Space>} rules={[{ required: true }]}>
+          <Form.Item name="model" label="Model" rules={[{ required: true }]}>
             <Input />
           </Form.Item>
-          <Form.Item name="year" label={<Space><CalendarOutlined />Year</Space>} rules={[{ required: true }]}>
+          <Form.Item name="year" label="Year" rules={[{ required: true }]}>
             <Input type="number" />
           </Form.Item>
           <Form.Item
             name="departmentId"
-            label={<Space><AppstoreAddOutlined />Model</Space>}
+            label="Department"
             rules={[{ required: true }]}
           >
             <Select placeholder="Select a department">
