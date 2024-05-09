@@ -283,9 +283,17 @@ export default function MaintenanceManagementPage() {
     ))}
   </Select>
 </Form.Item>
-          <Button type="primary" htmlType="submit">
-            Submit
-          </Button>
+        <Button
+           type="primary"
+            htmlType="submit"
+           style={{
+             backgroundColor: '#28a745',  // Bootstrap green
+             borderColor: '#28a745',  // Bootstrap green
+             color: 'white'  // Ensures text is readable against the green background
+             }}
+          >
+         Submit
+      </Button>
         </Form>
       </Modal>
     </PageLayout>
