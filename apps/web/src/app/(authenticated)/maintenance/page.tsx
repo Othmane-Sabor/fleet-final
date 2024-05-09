@@ -12,7 +12,7 @@ import {
   DatePicker,
   Select,
 } from 'antd'
-import { PlusOutlined, EditOutlined, DeleteOutlined, CarOutlined } from '@ant-design/icons';
+import { PlusOutlined, EditOutlined, DeleteOutlined, CarOutlined, ToolOutlined, CalendarOutlined, InfoCircleOutlined, TagOutlined} from '@ant-design/icons';
 const { Title, Text } = Typography
 const { Option } = Select
 import { useAuthentication } from '@web/modules/authentication'
@@ -218,7 +218,9 @@ export default function MaintenanceManagementPage() {
   return (
     <PageLayout layout="full-width">
       
-        <Title>Maintenance Management</Title>
+      <Title>
+      <span><ToolOutlined style={{ marginRight: 8 }} />Maintenance Management</span>
+      </Title>
       
       <Text>
         Manage and track maintenance tasks for vehicles in your fleet.
@@ -246,19 +248,23 @@ export default function MaintenanceManagementPage() {
         <Form form={form} onFinish={handleFinish}>
           <Form.Item
             name="scheduleDate"
-            label="Schedule Date"
+            label={<span><CalendarOutlined /> Schedule Date</span>}
             rules={[{ required: true }]}
           >
             <DatePicker />
           </Form.Item>
-          <Form.Item name="status" label="Status" rules={[{ required: true }]}>
+          <Form.Item 
+            name="status" 
+            label={<span><InfoCircleOutlined /> Status</span>}
+            rules={[{ required: true }]}
+            >
             <Select>
               <Option value="scheduled">Scheduled</Option>
               <Option value="completed">Completed</Option>
               <Option value="cancelled">Cancelled</Option>
             </Select>
           </Form.Item>
-          <Form.Item name="type" label="Type" rules={[{ required: true }]}>
+          <Form.Item name="type" label={<span><TagOutlined /> Type</span>} rules={[{ required: true }]}>
             <Input />
           </Form.Item>
           <Form.Item
