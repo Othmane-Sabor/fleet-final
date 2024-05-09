@@ -1,6 +1,5 @@
 'use client'
 
-import { PlusOutlined } from '@ant-design/icons'
 import { Api, Model } from '@web/domain'
 import { PageLayout } from '@web/layouts/Page.layout'
 import { useAuthentication } from '@web/modules/authentication'
@@ -14,16 +13,20 @@ import {
   Table,
   Typography,
 } from 'antd'
+import { PlusOutlined , BookOutlined, WarningOutlined, EditOutlined, CalendarOutlined, CheckCircleOutlined, CarOutlined} from '@ant-design/icons'
+
 import dayjs from 'dayjs'
 import { useRouter } from 'next/navigation'
 import { useSnackbar } from 'notistack'
 import { useEffect, useState } from 'react'
+
 const { Title, Text } = Typography
 const { Option } = Select
 
 export default function TaskManagementPage() {
   const router = useRouter()
   const [vehicles, setVehicles] = useState<Model.Vehicle[]>([])
+  const [hover, setHover] = useState(false)
 
   const { enqueueSnackbar } = useSnackbar()
   const authentication = useAuthentication()
@@ -84,6 +87,12 @@ export default function TaskManagementPage() {
       title: 'Description',
       dataIndex: 'description',
       key: 'description',
+      render: text => (
+        <>
+          <WarningOutlined style={{ color: 'red', marginRight: 8 }} />
+          {text}
+        </>
+      ),
     },
     {
       title: 'Due Date',
@@ -113,9 +122,11 @@ export default function TaskManagementPage() {
 
   console.log("vehicules", vehicles );
 
+  const hoverStyle = hover ? { backgroundColor: '#4CAF50', color: 'white' } : {};
+
   return (
     <PageLayout layout="full-width">
-      <Title level={2}>Task Management</Title>
+      <Title level={2}><BookOutlined style={{ marginRight: 8 }}/>Task Management</Title>
       <Text>
         This page allows fleet managers to oversee and manage tasks related to
         fleet operations.
@@ -124,7 +135,14 @@ export default function TaskManagementPage() {
         type="primary"
         icon={<PlusOutlined />}
         onClick={() => setIsModalVisible(true)}
-        style={{ marginBottom: 16 }}
+        onMouseEnter={() => setHover(true)}
+       onMouseLeave={() => setHover(false)}
+       style={{
+        marginBottom: 16,
+        backgroundColor: hover ? '#4CAF50' : '#1890ff',  // Normal state color
+        borderColor: hover ? '#3e8e41' : '#1890ff',  // Normal state border color
+        ...hoverStyle  // This applies additional styles when hovered
+        }}
       >
         Add Task
       </Button>
@@ -143,21 +161,21 @@ export default function TaskManagementPage() {
               { required: true, message: 'Please input the description!' },
             ]}
           >
-            <Input />
+            <Input prefix={<EditOutlined />} />
           </Form.Item>
           <Form.Item
             name="dueDate"
             label="Due Date"
             rules={[{ required: true, message: 'Please select the due date!' }]}
           >
-            <DatePicker />
+            <DatePicker suffixIcon={<CalendarOutlined />} />
           </Form.Item>
           <Form.Item
             name="status"
             label="Status"
             rules={[{ required: true, message: 'Please select the status!' }]}
           >
-            <Select>
+            <Select suffixIcon={<CheckCircleOutlined />}>
               <Option value="Pending">Pending</Option>
               <Option value="InProgress">In Progress</Option>
               <Option value="Completed">Completed</Option>
@@ -168,8 +186,8 @@ export default function TaskManagementPage() {
             label="Vehicle"
             rules={[{ required: true, message: 'Please select the vehicle!' }]}
           >
-            <Select>{/* Placeholder for vehicle options */}
-            {vehicles.map(vehicle => (
+          <Select suffixIcon={<CarOutlined />}>
+              {vehicles.map(vehicle => (
                 <Option key={vehicle.id} value={vehicle.id}>
                   {vehicle.model}
                 </Option>
