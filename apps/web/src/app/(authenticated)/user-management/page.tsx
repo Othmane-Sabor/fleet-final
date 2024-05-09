@@ -24,6 +24,7 @@ export default function UserManagementPage() {
   const { enqueueSnackbar } = useSnackbar()
   const authentication = useAuthentication()
   const [hover, setHover] = useState(false)
+  const [okHover, setOkHover] = useState(false);
   const userId = authentication.user?.id
 
   const [users, setUsers] = useState<Model.User[]>([])
@@ -151,14 +152,32 @@ export default function UserManagementPage() {
         ...hoverStyle  // This applies additional styles when hovered
         }}
       >
-        Add Task
+        Ajouter un utilisateur
       </Button>
       <Table dataSource={users} columns={columns} rowKey="id" />
       <Modal
         title={currentUserId ? 'Edit User' : 'Add User'}
         visible={isModalVisible}
         onCancel={() => setIsModalVisible(false)}
-        onOk={() => form.submit()}
+        footer={[
+          <Button key="back" onClick={() => setIsModalVisible(false)}>
+            Cancel
+          </Button>,
+          <Button 
+            key="submit" 
+            type="primary" 
+            onClick={() => form.submit()}
+            onMouseEnter={() => setOkHover(true)}
+            onMouseLeave={() => setOkHover(false)}
+            style={{
+              backgroundColor: okHover ? '#4CAF50' : '#1890ff', // Default blue, green when hovered
+              borderColor: okHover ? '#3e8e41' : '#1890ff', // Default blue border, darker green when hovered
+              color: okHover ? 'white' : null // Default text color, white when hovered
+            }}
+          >
+            OK
+          </Button>
+        ]}
       >
         <Form form={form} onFinish={handleFormSubmit} layout="vertical">
           <Form.Item

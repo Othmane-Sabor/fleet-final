@@ -7,6 +7,7 @@ import {
   ToolOutlined,
   DollarOutlined,
   CheckCircleOutlined,
+  LineChartOutlined
 } from '@ant-design/icons'
 const { Title, Text } = Typography
 import { useAuthentication } from '@web/modules/authentication'
@@ -66,7 +67,9 @@ export default function ReportsAnalyticsPage() {
 
   return (
     <PageLayout layout="full-width">
-      <Title level={2}>Fleet Operations Analytics</Title>
+      <Title level={2}>
+  <span><LineChartOutlined style={{ marginRight: 8 }} />Fleet Operations Analytics</span>
+</Title>
       <Text>
         Comprehensive analytics and reports on fleet operations, including task
         completion rates, fuel expenses, and maintenance history.
