@@ -7,6 +7,7 @@ import {
   ToolOutlined,
   AlertOutlined,
   UserOutlined,
+  DashboardOutlined
 } from '@ant-design/icons'
 const { Title, Text } = Typography
 import { useAuthentication } from '@web/modules/authentication'
@@ -62,7 +63,9 @@ export default function HomePage() {
 
   return (
     <PageLayout layout="full-width">
-      <Title level={2}>Fleet Master Dashboard</Title>
+      <Title level={2}>
+  <span><DashboardOutlined style={{ marginRight: 8 }} />Fleet Master Dashboard</span>
+</Title>
       <Text>Welcome to your fleet management overview.</Text>
 
       <Row gutter={16} style={{ marginTop: 20 }}>
@@ -74,7 +77,7 @@ export default function HomePage() {
               renderItem={item => (
                 <List.Item>
                   <List.Item.Meta
-                    avatar={<Avatar icon={<CarOutlined />} />}
+                    avatar={<Avatar icon={<CarOutlined style={{ backgroundColor: '#52c41a', color: 'white' }} />} />}
                     title={item.model}
                     description={`Year: ${item.year} - Type: ${item.vehicleType?.typeName}`}
                   />
@@ -91,7 +94,7 @@ export default function HomePage() {
               renderItem={item => (
                 <List.Item>
                   <List.Item.Meta
-                    avatar={<Avatar icon={<ToolOutlined />} />}
+                    avatar={<Avatar icon={<ToolOutlined style={{ backgroundColor: '#fadb14', color: 'white' }} />} />}
                     title={item.description}
                     description={`Due: ${dayjs(item.dueDate).format('YYYY-MM-DD')} - Status: ${item.status}`}
                   />
@@ -128,7 +131,7 @@ export default function HomePage() {
               renderItem={item => (
                 <List.Item>
                   <List.Item.Meta
-                    avatar={<Avatar icon={<AlertOutlined />} />}
+                     avatar={<Avatar icon={<AlertOutlined style={{ backgroundColor: '#ff4d4f', color: 'white' }} />} />}
                     title={item.message}
                     description={`Criticality: ${item.criticality}`}
                   />
