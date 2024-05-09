@@ -1,28 +1,30 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import {
-  Button,
-  Table,
-  Typography,
-  Modal,
-  Form,
-  Input,
-  DatePicker,
-  Select,
-} from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
-const { Title, Text } = Typography
-const { Option } = Select
-import { useAuthentication } from '@web/modules/authentication'
-import dayjs from 'dayjs'
-import { useSnackbar } from 'notistack'
-import { useRouter, useParams } from 'next/navigation'
 import { Api, Model } from '@web/domain'
 import { PageLayout } from '@web/layouts/Page.layout'
+import { useAuthentication } from '@web/modules/authentication'
+import {
+  Button,
+  DatePicker,
+  Form,
+  Input,
+  Modal,
+  Select,
+  Table,
+  Typography,
+} from 'antd'
+import dayjs from 'dayjs'
+import { useRouter } from 'next/navigation'
+import { useSnackbar } from 'notistack'
+import { useEffect, useState } from 'react'
+const { Title, Text } = Typography
+const { Option } = Select
 
 export default function TaskManagementPage() {
   const router = useRouter()
+  const [vehicles, setVehicles] = useState<Model.Vehicle[]>([])
+
   const { enqueueSnackbar } = useSnackbar()
   const authentication = useAuthentication()
   const userId = authentication.user?.id
@@ -30,11 +32,24 @@ export default function TaskManagementPage() {
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [form] = Form.useForm()
 
+  const fetchVehicles = async () => {
+    try {
+      const vehiclesFound = await Api.Vehicle.findMany()
+      setVehicles(vehiclesFound)
+    } catch (error) {
+      enqueueSnackbar('Failed to fetch vehicles', { variant: 'error' })
+    }
+  }
+
   useEffect(() => {
     if (userId) {
       fetchTasks()
+      fetchVehicles()
+
     }
   }, [userId])
+
+  
 
   const fetchTasks = async () => {
     try {
@@ -94,6 +109,9 @@ export default function TaskManagementPage() {
       render: (_, record) => record.vehicle?.model || 'No Vehicle',
     },
   ]
+  
+
+  console.log("vehicules", vehicles );
 
   return (
     <PageLayout layout="full-width">
@@ -150,7 +168,13 @@ export default function TaskManagementPage() {
             label="Vehicle"
             rules={[{ required: true, message: 'Please select the vehicle!' }]}
           >
-            <Select>{/* Placeholder for vehicle options */}</Select>
+            <Select>{/* Placeholder for vehicle options */}
+            {vehicles.map(vehicle => (
+                <Option key={vehicle.id} value={vehicle.id}>
+                  {vehicle.model}
+                </Option>
+              ))}
+            </Select>
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit">

@@ -12,7 +12,7 @@ import {
   DatePicker,
   Select,
 } from 'antd'
-import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons'
+import { PlusOutlined, EditOutlined, DeleteOutlined, CarOutlined } from '@ant-design/icons';
 const { Title, Text } = Typography
 const { Option } = Select
 import { useAuthentication } from '@web/modules/authentication'
@@ -29,9 +29,12 @@ export default function MaintenanceManagementPage() {
   const userId = authentication.user?.id
 
   const [vehicles, setVehicles] = useState([])
+  const [vehiculesMain, setVehiclesMain] = useState([])
+
   const [selectedVehicle, setSelectedVehicle] = useState(null)
   const [maintenanceModalVisible, setMaintenanceModalVisible] = useState(false)
   const [form] = Form.useForm()
+  console.log(vehicles)
 
   useEffect(() => {
     const fetchVehicles = async () => {
@@ -39,6 +42,20 @@ export default function MaintenanceManagementPage() {
         const vehiclesData = await Api.Vehicle.findMany({
           includes: ['maintenances'],
         })
+
+        const vehiclesWithMaintenances = vehiclesData.reduce((acc, vehicle) => {
+          if (vehicle.maintenances.length > 0) {
+            vehicle.maintenances.forEach(maintenance => {
+              acc.push({
+                ...maintenance,
+                vehicleModel: vehicle.model, // Include the vehicle model in the maintenance record
+              });
+            });
+          }
+          return acc;
+        }, []);
+        
+        setVehiclesMain(vehiclesWithMaintenances)
         setVehicles(vehiclesData)
       } catch (error) {
         enqueueSnackbar('Failed to fetch vehicles', { variant: 'error' })
@@ -85,12 +102,12 @@ export default function MaintenanceManagementPage() {
     }
 
     try {
-      if (maintenanceData.id) {
-        await Api.Maintenance.updateOne(maintenanceData.id, maintenanceData)
-        enqueueSnackbar('Maintenance updated successfully', {
-          variant: 'success',
-        })
-      } else {
+       if (maintenanceData.id) {
+         await Api.Maintenance.updateOne(maintenanceData.id, maintenanceData)
+         enqueueSnackbar('Maintenance updated successfully', {
+           variant: 'success',
+         })
+       } else {
         await Api.Maintenance.createOneByVehicleId(
           selectedVehicle,
           maintenanceData,
@@ -109,59 +126,114 @@ export default function MaintenanceManagementPage() {
   const columns = [
     {
       title: 'Vehicle',
-      dataIndex: 'licensePlate',
-      key: 'licensePlate',
+      dataIndex: 'model',
+      key: 'model',
+      style: { backgroundColor: '#f0f2f5' } // Light grey background for column headers
     },
     {
       title: 'Schedule Date',
       dataIndex: 'scheduleDate',
       key: 'scheduleDate',
-      render: text => dayjs(text).format('YYYY-MM-DD'),
+      style: { backgroundColor: '#f0f2f5' }
     },
     {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
+      style: { backgroundColor: '#f0f2f5' }
     },
     {
       title: 'Type',
       dataIndex: 'type',
       key: 'type',
+      style: { backgroundColor: '#f0f2f5' }
     },
     {
       title: 'Actions',
       key: 'actions',
+      style: { backgroundColor: '#f0f2f5' },
       render: (_, record) => (
         <Space>
           <Button
             icon={<EditOutlined />}
             onClick={() => handleEditMaintenance(record)}
+            style={{ color: '#1890ff' }} // Blue color for the edit icon
           />
           <Button
             icon={<DeleteOutlined />}
             onClick={() => handleDeleteMaintenance(record.id)}
+            style={{ color: '#ff4d4f' }} // Red color for the delete icon
           />
         </Space>
       ),
     },
-  ]
+  ];
 
+  const columns2 = [
+    {
+      title: 'Vehicle',
+      dataIndex: 'vehicleModel',
+      key: 'vehicleModel',
+      style: { backgroundColor: '#f0f2f5' } // Light grey background for column headers
+    },
+    {
+      title: 'Schedule Date',
+      dataIndex: 'scheduleDate',
+      key: 'scheduleDate',
+      style: { backgroundColor: '#f0f2f5' }
+    },
+    {
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+      style: { backgroundColor: '#f0f2f5' }
+    },
+    {
+      title: 'Type',
+      dataIndex: 'type',
+      key: 'type',
+      style: { backgroundColor: '#f0f2f5' }
+    },
+    {
+      title: 'Actions',
+      key: 'actions',
+      style: { backgroundColor: '#f0f2f5' },
+      render: (_, record) => (
+        <Space>
+          <Button
+            icon={<EditOutlined />}
+            onClick={() => handleEditMaintenance(record)}
+            style={{ color: '#1890ff' }} // Blue color for the edit icon
+          />
+          <Button
+            icon={<DeleteOutlined />}
+            onClick={() => handleDeleteMaintenance(record.id)}
+            style={{ color: '#ff4d4f' }} // Red color for the delete icon
+          />
+        </Space>
+      ),
+    },
+  ];
+  
   return (
     <PageLayout layout="full-width">
-      <Title>Maintenance Management</Title>
+      
+        <Title>Maintenance Management</Title>
+      
       <Text>
         Manage and track maintenance tasks for vehicles in your fleet.
       </Text>
       <Button
-        type="primary"
-        icon={<PlusOutlined />}
-        onClick={handleAddMaintenance}
-      >
-        Add Maintenance
-      </Button>
+  type="primary"
+  icon={<PlusOutlined />}
+  onClick={handleAddMaintenance}
+  style={{ backgroundColor: '#1DA57A', borderColor: '#1DA57A' }} // Green color
+>
+  Add Maintenance
+</Button>
       <Table
-        dataSource={vehicles.flatMap(v => v.maintenances)}
-        columns={columns}
+        dataSource={vehiculesMain}
+        columns={columns2}
         rowKey="id"
       />
 
@@ -189,6 +261,22 @@ export default function MaintenanceManagementPage() {
           <Form.Item name="type" label="Type" rules={[{ required: true }]}>
             <Input />
           </Form.Item>
+          <Form.Item
+  name="vehicleId"
+  label={<span><CarOutlined /> Vehicle</span>}
+  rules={[{ required: true, message: 'Please select the vehicle!' }]}
+>
+  <Select
+    placeholder="Select a vehicle"
+    onChange={(value) => setSelectedVehicle(value)} // Update selected vehicle on change
+  >
+    {vehicles.map(vehicle => (
+      <Option key={vehicle.id} value={vehicle.id}>
+        {vehicle.model}
+      </Option>
+    ))}
+  </Select>
+</Form.Item>
           <Button type="primary" htmlType="submit">
             Submit
           </Button>
@@ -197,3 +285,4 @@ export default function MaintenanceManagementPage() {
     </PageLayout>
   )
 }
+

@@ -1,6 +1,5 @@
 'use client'
-
-import { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react';
 import {
   Button,
   Card,
@@ -11,45 +10,55 @@ import {
   Input,
   Select,
   Space,
-} from 'antd'
-import { ExclamationCircleOutlined, PlusOutlined } from '@ant-design/icons'
-const { Title, Text } = Typography
-const { Option } = Select
-const { confirm } = Modal
-import { useAuthentication } from '@web/modules/authentication'
-import dayjs from 'dayjs'
-import { useSnackbar } from 'notistack'
-import { useRouter, useParams } from 'next/navigation'
-import { Api, Model } from '@web/domain'
-import { PageLayout } from '@web/layouts/Page.layout'
+  Form,
+} from 'antd';
+import { ExclamationCircleOutlined, PlusOutlined } from '@ant-design/icons';
+const { Title, Text } = Typography;
+const { Option } = Select;
+const { confirm } = Modal;
+import { useAuthentication } from '@web/modules/authentication';
+import dayjs from 'dayjs';
+import { useSnackbar } from 'notistack';
+import { useRouter, useParams } from 'next/navigation';
+import { Api, Model } from '@web/domain';
+import { PageLayout } from '@web/layouts/Page.layout';
 
 export default function AlertsPage() {
-  const router = useRouter()
-  const params = useParams<any>()
-  const authentication = useAuthentication()
-  const userId = authentication.user?.id
-  const { enqueueSnackbar } = useSnackbar()
-  const [alerts, setAlerts] = useState<Model.Alert[]>([])
-  const [loading, setLoading] = useState(true)
+  const router = useRouter();
+  const params = useParams<any>();
+  const authentication = useAuthentication();
+  const userId = authentication.user?.id;
+  const { enqueueSnackbar } = useSnackbar();
+  const [alerts, setAlerts] = useState<Model.Alert[]>([]);
+  const [vehicles, setVehicles] = useState<Model.Vehicle[]>([]);
+  const [selectedVehicleId, setSelectedVehicleId] = useState<string | undefined>();
 
   useEffect(() => {
     if (userId) {
-      fetchAlerts()
+      fetchAlerts();
+      fetchVehicles();
     }
-  }, [userId])
+  }, [userId]);
+
+  const fetchVehicles = async () => {
+    try {
+      const vehiclesData = await Api.Vehicle.findMany();
+      setVehicles(vehiclesData);
+    } catch (error) {
+      enqueueSnackbar('Failed to fetch vehicles', { variant: 'error' });
+    }
+  };
 
   const fetchAlerts = async () => {
     try {
       const userAlerts = await Api.Alert.findManyByVehicleId(userId, {
         includes: ['vehicle'],
-      })
-      setAlerts(userAlerts)
-      setLoading(false)
+      });
+      setAlerts(userAlerts);
     } catch (error) {
-      enqueueSnackbar('Failed to fetch alerts', { variant: 'error' })
-      setLoading(false)
+      enqueueSnackbar('Failed to fetch alerts', { variant: 'error' });
     }
-  }
+  };
 
   const handleDeleteAlert = (alertId: string) => {
     confirm({
@@ -58,25 +67,29 @@ export default function AlertsPage() {
       content: 'This action cannot be undone',
       onOk: async () => {
         try {
-          await Api.Alert.deleteOne(alertId)
-          fetchAlerts()
-          enqueueSnackbar('Alert deleted successfully', { variant: 'success' })
+          await Api.Alert.deleteOne(alertId);
+          fetchAlerts();
+          enqueueSnackbar('Alert deleted successfully', { variant: 'success' });
         } catch (error) {
-          enqueueSnackbar('Failed to delete alert', { variant: 'error' })
+          enqueueSnackbar('Failed to delete alert', { variant: 'error' });
         }
       },
-    })
-  }
+    });
+  };
 
-  const handleCreateAlert = async (values: Partial<Model.Alert>) => {
-    try {
-      await Api.Alert.createOneByVehicleId(userId, values)
-      fetchAlerts()
-      enqueueSnackbar('Alert created successfully', { variant: 'success' })
-    } catch (error) {
-      enqueueSnackbar('Failed to create alert', { variant: 'error' })
+  const handleCreateAlert = async () => {
+    if (!selectedVehicleId) {
+      enqueueSnackbar('Please select a vehicle first.', { variant: 'error' });
+      return;
     }
-  }
+    try {
+      await Api.Alert.createOneByVehicleId(selectedVehicleId, { message: 'New alert', criticality: 'High' });
+      fetchAlerts();
+      enqueueSnackbar('Alert created successfully, including Vehicle ID.', { variant: 'success' });
+    } catch (error) {
+      enqueueSnackbar('Failed to create alert', { variant: 'error' });
+    }
+  };
 
   return (
     <PageLayout layout="full-width">
@@ -84,12 +97,15 @@ export default function AlertsPage() {
       <Text type="secondary">
         Manage and view all vehicle alerts and notifications.
       </Text>
+      <Select placeholder="Select a vehicle" style={{ width: 200, marginBottom: 16 }} onChange={setSelectedVehicleId}>
+        {vehicles.map(vehicle => (
+          <Option key={vehicle.id} value={vehicle.id}>{vehicle.model}</Option>
+        ))}
+      </Select>
       <Button
         type="primary"
         icon={<PlusOutlined />}
-        onClick={() =>
-          handleCreateAlert({ message: 'New alert', criticality: 'High' })
-        }
+        onClick={handleCreateAlert}
         style={{ marginBottom: 16 }}
       >
         Add Alert
@@ -120,5 +136,5 @@ export default function AlertsPage() {
         ))}
       </Row>
     </PageLayout>
-  )
+  );
 }

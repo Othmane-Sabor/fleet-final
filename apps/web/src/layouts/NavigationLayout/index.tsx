@@ -61,11 +61,11 @@ export const NavigationLayout: React.FC<Props> = ({ children }) => {
       onClick: () => goTo('/maintenance'),
     },
 
-    {
-      key: '/alerts',
-      label: 'Alerts',
-      onClick: () => goTo('/alerts'),
-    },
+    // {
+    //   key: '/alerts',
+    //   label: 'Alerts',
+    //   onClick: () => goTo('/alerts'),
+    // },
 
     {
       key: '/reports',
