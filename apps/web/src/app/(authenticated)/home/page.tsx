@@ -64,9 +64,9 @@ export default function HomePage() {
   return (
     <PageLayout layout="full-width">
       <Title level={2}>
-  <span><DashboardOutlined style={{ marginRight: 8 }} />Fleet Master Dashboard</span>
+  <span><DashboardOutlined style={{ marginRight: 8 }} />Tableau de Bord Fleet Master</span>
 </Title>
-      <Text>Welcome to your fleet management overview.</Text>
+      <Text>Bienvenue dans votre bilan de flotte.</Text>
 
       <Row gutter={16} style={{ marginTop: 20 }}>
         <Col span={12}>
@@ -87,7 +87,7 @@ export default function HomePage() {
           </Card>
         </Col>
         <Col span={12}>
-          <Card title="Tasks" extra={<ToolOutlined />} bordered={false}>
+          <Card title="Tâches" extra={<ToolOutlined />} bordered={false}>
             <List
               itemLayout="horizontal"
               dataSource={tasks}
